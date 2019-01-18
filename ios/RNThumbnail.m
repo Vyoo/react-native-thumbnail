@@ -16,11 +16,20 @@ RCT_EXPORT_METHOD(get:(NSString *)filepath resolve:(RCTPromiseResolveBlock)resol
                                reject:(RCTPromiseRejectBlock)reject)
 {
     @try {
+        NSURL *vidURL = NULL;
+        AVURLAsset *asset = NULL;
+        
         filepath = [filepath stringByReplacingOccurrencesOfString:@"file://"
-                                                  withString:@""];
-        NSURL *vidURL = [NSURL URLWithString:filepath];
+                                                       withString:@""];
+        
+        if([filepath hasPrefix:@"asset"]) {
+            vidURL = [NSURL URLWithString:filepath];
+            asset = [AVURLAsset URLAssetWithURL:vidURL options:nil];
+        } else {
+            vidURL = [NSURL fileURLWithPath:filepath];
+            asset = [[AVURLAsset alloc] initWithURL:vidURL options:nil];
+        }
 
-        AVURLAsset *asset = [AVURLAsset URLAssetWithURL:vidURL options:nil];
         AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
         generator.appliesPreferredTrackTransform = YES;
 
